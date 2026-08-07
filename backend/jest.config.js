@@ -3,5 +3,13 @@ module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/src', '<rootDir>/tests'],
   moduleFileExtensions: ['ts', 'js', 'json'],
-  testMatch: ['**/*.test.ts']
+  testMatch: ['**/*.test.ts'],
+  coverageThreshold: {
+    global: {
+      statements: 80,
+      branches: 80,
+      functions: 80,
+      lines: 80
+    }
+  }
 };

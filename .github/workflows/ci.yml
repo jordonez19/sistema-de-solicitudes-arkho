@@ -32,10 +32,10 @@ jobs:
           cd backend
           npm run build
 
-      - name: Run Backend Tests
+      - name: Run Unit Tests & Enforce >80% Code Coverage Threshold
         run: |
           cd backend
-          npm test
+          npm run test:coverage
 
   frontend-validation:
     name: Frontend CI (Vite & React)

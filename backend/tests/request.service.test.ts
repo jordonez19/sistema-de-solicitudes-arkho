@@ -98,6 +98,14 @@ describe('RequestService Unit Tests', () => {
       await expect(service.updateRequestStatus('id-inexistente', 'completada')).rejects.toThrow(AppError);
       await expect(service.updateRequestStatus('id-inexistente', 'completada')).rejects.toThrow('no existe');
     });
+
+    it('debe lanzar AppError 500 si la actualización de estado falla en BD', async () => {
+      mockRepository.findById.mockResolvedValue(mockRequest);
+      mockRepository.updateStatus.mockResolvedValue(null);
+
+      await expect(service.updateRequestStatus(mockRequest.id, 'en_proceso')).rejects.toThrow(AppError);
+      await expect(service.updateRequestStatus(mockRequest.id, 'en_proceso')).rejects.toThrow('Error al actualizar el estado');
+    });
   });
 
   describe('updateRequestPriority', () => {
@@ -119,6 +127,53 @@ describe('RequestService Unit Tests', () => {
 
       await expect(service.updateRequestPriority('id-inexistente', 'alta')).rejects.toThrow(AppError);
       await expect(service.updateRequestPriority('id-inexistente', 'alta')).rejects.toThrow('no existe');
+    });
+
+    it('debe lanzar AppError 500 si la actualización de prioridad falla en BD', async () => {
+      mockRepository.findById.mockResolvedValue(mockRequest);
+      mockRepository.updatePriority.mockResolvedValue(null);
+
+      await expect(service.updateRequestPriority(mockRequest.id, 'baja')).rejects.toThrow(AppError);
+      await expect(service.updateRequestPriority(mockRequest.id, 'baja')).rejects.toThrow('Error al actualizar la prioridad');
+    });
+  });
+
+  describe('updateRequest (Edición completa)', () => {
+    it('debe actualizar los campos de una solicitud existente', async () => {
+      const updateData = {
+        title: 'Título editado',
+        description: 'Descripción editada',
+        applicant: 'editado@empresa.com',
+        priority: 'alta' as const,
+        status: 'completada' as const
+      };
+
+      mockRepository.findById.mockResolvedValue(mockRequest);
+      mockRepository.update.mockResolvedValue({
+        ...mockRequest,
+        ...updateData
+      });
+
+      const result = await service.updateRequest(mockRequest.id, updateData);
+
+      expect(result.title).toBe('Título editado');
+      expect(result.status).toBe('completada');
+      expect(mockRepository.update).toHaveBeenCalledWith(mockRequest.id, updateData);
+    });
+
+    it('debe lanzar AppError 404 si se intenta editar una solicitud inexistente', async () => {
+      mockRepository.findById.mockResolvedValue(null);
+
+      await expect(service.updateRequest('id-inexistente', { title: 'Nuevo' })).rejects.toThrow(AppError);
+      await expect(service.updateRequest('id-inexistente', { title: 'Nuevo' })).rejects.toThrow('no existe');
+    });
+
+    it('debe lanzar AppError 500 si la edición completa falla en BD', async () => {
+      mockRepository.findById.mockResolvedValue(mockRequest);
+      mockRepository.update.mockResolvedValue(null);
+
+      await expect(service.updateRequest(mockRequest.id, { title: 'Nuevo' })).rejects.toThrow(AppError);
+      await expect(service.updateRequest(mockRequest.id, { title: 'Nuevo' })).rejects.toThrow('Error al actualizar la solicitud');
     });
   });
 });

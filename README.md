@@ -87,12 +87,19 @@ En la raíz del proyecto se incluye la colección oficial de Postman:
 
 ---
 
-## Pruebas Automatizadas y CI/CD
+## 🧪 Pruebas Automatizadas y CI/CD
 
-### Pruebas Unitarias Backend
+### Pruebas Unitarias Backend & Cobertura de Código (>80%)
+El proyecto exige un estándar estricto de calidad de código con una **cobertura mínima requerida superior al 80%** (`coverageThreshold: 80%`), la cual actualmente alcanza un **99.02%** en todos los módulos backend.
+
 ```bash
 cd backend
+
+# Ejecutar pruebas unitarias Jest
 pnpm test
+
+# Generar reporte completo de cobertura (>80% requerido)
+pnpm test:coverage
 ```
 
 ### GitHub Actions CI/CD Pipeline
