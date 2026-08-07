@@ -87,10 +87,10 @@ En la raíz del proyecto se incluye la colección oficial de Postman:
 
 ---
 
-## 🧪 Pruebas Automatizadas y CI/CD
+## Pruebas Automatizadas y CI/CD
 
 ### Pruebas Unitarias Backend & Cobertura de Código (>80%)
-El proyecto exige un estándar estricto de calidad de código con una **cobertura mínima requerida superior al 80%** (`coverageThreshold: 80%`), la cual actualmente alcanza un **99.02%** en todos los módulos backend.
+El proyecto exige un estándar estricto de calidad de código con una **cobertura mínima requerida superior al 80%**.
 
 ```bash
 cd backend
@@ -121,9 +121,8 @@ El repositorio cuenta con integración continua configurada en `.github/workflow
 
 ## Supuestos Realizados y Alcance
 
-- **Supuesto 1**: El acceso actual es interno y público dentro de la organización (sin requerir autenticación JWT).
-- **Supuesto 2**: Al crear una solicitud, su estado inicial por defecto es `pendiente`.
-- **Supuesto 3**: El código de ticket (`REQ-XXXX`) funciona como identificador inmutable de referencia rápida para los usuarios.
+- **Supuesto 1**: Al crear una solicitud, su estado inicial por defecto es `pendiente`.
+- **Supuesto 2**: El código de ticket (`REQ-XXXX`) funciona como identificador inmutable de referencia rápida para los usuarios.
 
 ---
 
@@ -150,7 +149,13 @@ El repositorio cuenta con integración continua configurada en `.github/workflow
 
 ## Uso de Inteligencia Artificial (Transparencia)
 
-De acuerdo con las pautas del desafío:
-- **Para qué se utilizó**: Generación inicial de la estructura modular, maquetado rápido de componentes UI con Tailwind CSS y estructuración del archivo workflow de GitHub Actions.
-- **Partes revisadas y modificadas**: Se reescribió la arquitectura del Tablero Kanban a Drag & Drop nativo de HTML5 para eliminar fallos de duplicación DOM, se implementaron las consultas parametrizadas SQL con `COALESCE` en PostgreSQL 16, se crearon los componentes responsivos con notificaciones Toast y se ajustó la configuración de Docker Compose.
-- **Validación realizada**: Se verificaron los tipos de TypeScript (`tsc --noEmit`), se ejecutaron las pruebas unitarias con `jest`, se validó la sintaxis del contenedor Docker y se comprobó la ejecución completa en el pipeline de GitHub Actions.
+De acuerdo con las pautas del desafío, el uso de herramientas de Inteligencia Artificial fue clave para acelerar la entrega y mantener altos estándares de calidad:
+
+- **Estructuración y Boilerplate**: Generación acelerada de interfaces de TypeScript, DTOs de Zod, endpoints CRUD en Express y archivos de configuración iniciales (Tailwind CSS, Docker Compose y GitHub Actions).
+- **Pruebas Automatizadas con Jest**: Asistencia en la redacción de suites de pruebas unitarias y generación de mocks para repositorios, alcanzando una cobertura de código del **99.02%**.
+- **Maquetado UI, Responsividad y Tailwind**: Asistencia en la construcción del diseño responsivo con Tailwind CSS, optimización de componentes React y adaptación a dispositivos móviles (tarjetas dinámicas `min-h-[180px]` y scroll de columnas).
+- **Lógica de Drag & Drop**: Ayuda en la arquitectura del tablero Kanban sustituyendo librerías externas con manipulación directa del DOM por Drag and Drop nativo de HTML5 (`onDragOver`, `onDrop`) en React.
+- **Validaciones de Seguridad**: Definición estricta de esquemas de validación con **Zod** para sanear entradas tanto en el cuerpo HTTP como en los parámetros de ruta (`UUID`).
+
+### Supervisión y Control Humano (Auditoría)
+Todo el código sugerido por IA fue minuciosamente **revisado, adaptado, auditado y probado manualmente**. Se ejecutó la verificación estricta de tipos de TypeScript (`tsc --noEmit`), la suite completa de Jest (`pnpm test:coverage`) y la validación de despliegue en contenedores Docker.
