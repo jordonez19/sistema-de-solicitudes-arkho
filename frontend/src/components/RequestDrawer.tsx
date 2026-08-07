@@ -20,6 +20,7 @@ export const RequestDrawer: React.FC<RequestDrawerProps> = ({
   const [status, setStatus] = useState<RequestStatus>('pendiente');
   const [priority, setPriority] = useState<RequestPriority>('media');
 
+  const [touched, setTouched] = useState<{ title?: boolean; description?: boolean; applicant?: boolean }>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
@@ -36,10 +37,15 @@ export const RequestDrawer: React.FC<RequestDrawerProps> = ({
       setSaveError(null);
       setSaveSuccess(false);
       setIsConfirmingDelete(false);
+      setTouched({});
     }
   }, [request]);
 
   if (!request) return null;
+
+  const titleError = touched.title && (!title.trim() ? 'El título es requerido' : title.trim().length < 3 ? 'Debe tener al menos 3 caracteres' : null);
+  const descriptionError = touched.description && (!description.trim() ? 'La descripción es requerida' : description.trim().length < 5 ? 'Debe tener al menos 5 caracteres' : null);
+  const applicantError = touched.applicant && (!applicant.trim() ? 'El solicitante es requerido' : applicant.trim().length < 2 ? 'Debe tener al menos 2 caracteres' : null);
 
   const handleDelete = async () => {
     if (!onDeleteRequest || !request) return;
@@ -57,19 +63,20 @@ export const RequestDrawer: React.FC<RequestDrawerProps> = ({
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setTouched({ title: true, description: true, applicant: true });
     setSaveError(null);
     setSaveSuccess(false);
 
-    if (!title.trim() || title.length < 3) {
-      setSaveError('El título debe tener al menos 3 caracteres.');
+    if (!title.trim() || title.trim().length < 3) {
+      setSaveError('Por favor corrige los campos remarcados en rojo.');
       return;
     }
-    if (!description.trim() || description.length < 5) {
-      setSaveError('La descripción debe tener al menos 5 caracteres.');
+    if (!description.trim() || description.trim().length < 5) {
+      setSaveError('Por favor corrige los campos remarcados en rojo.');
       return;
     }
-    if (!applicant.trim() || applicant.length < 2) {
-      setSaveError('El solicitante debe tener al menos 2 caracteres.');
+    if (!applicant.trim() || applicant.trim().length < 2) {
+      setSaveError('Por favor corrige los campos remarcados en rojo.');
       return;
     }
 
@@ -83,58 +90,57 @@ export const RequestDrawer: React.FC<RequestDrawerProps> = ({
         priority
       });
       setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
+      setSaveError(null);
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 3000);
     } catch (err: any) {
-      setSaveError(err.message || 'Error al guardar los cambios');
+      setSaveError(err.message || 'Error al actualizar la solicitud');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const formattedCreatedDate = new Date(request.createdAt).toLocaleString('es-ES', {
-    dateStyle: 'long',
-    timeStyle: 'short'
-  });
-
-  const formattedUpdatedDate = request.updatedAt
-    ? new Date(request.updatedAt).toLocaleString('es-ES', {
-        dateStyle: 'long',
-        timeStyle: 'short'
-      })
-    : null;
-
-  // Status tag box & badge styles
-  const statusBoxBg =
-    status === 'completada'
-      ? 'bg-[#86EFAC]'
-      : status === 'en_proceso'
-      ? 'bg-[#FCD34D]'
-      : 'bg-[#94A3B8]';
-
   const statusColorClass =
     status === 'completada'
-      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+      ? 'border-emerald-300 bg-emerald-50/50 text-emerald-800'
       : status === 'en_proceso'
-      ? 'bg-amber-50 text-amber-800 border-amber-200'
-      : 'bg-slate-100 text-slate-700 border-slate-200';
+      ? 'border-amber-300 bg-amber-50/50 text-amber-900'
+      : 'border-slate-300 bg-slate-100 text-slate-700';
 
-  // Priority tag box & badge styles
-  const priorityBoxBg =
-    priority === 'alta'
-      ? 'bg-[#F87171]'
-      : priority === 'media'
-      ? 'bg-[#FCD34D]'
-      : 'bg-[#94A3B8]';
+  const statusBoxBg =
+    status === 'completada' ? 'bg-[#86EFAC]' : status === 'en_proceso' ? 'bg-[#FCD34D]' : 'bg-[#94A3B8]';
 
   const priorityColorClass =
     priority === 'alta'
-      ? 'bg-red-50 text-red-800 border-red-200'
+      ? 'border-red-300 bg-red-50/50 text-red-800'
       : priority === 'media'
-      ? 'bg-amber-50 text-amber-800 border-amber-200'
-      : 'bg-slate-100 text-slate-700 border-slate-200';
+      ? 'border-amber-300 bg-amber-50/50 text-amber-900'
+      : 'border-slate-300 bg-slate-100 text-slate-700';
+
+  const priorityBoxBg =
+    priority === 'alta' ? 'bg-[#F87171]' : priority === 'media' ? 'bg-[#FCD34D]' : 'bg-[#94A3B8]';
+
+  const formattedCreatedDate = new Date(request.createdAt).toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  const formattedUpdatedDate = request.updatedAt
+    ? new Date(request.updatedAt).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    : null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-hidden animate-fade-in">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-slate-900/50 transition-opacity"
@@ -163,6 +169,10 @@ export const RequestDrawer: React.FC<RequestDrawerProps> = ({
 
           {/* Drawer Form Body */}
           <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
+            <p className="text-[11px] text-slate-500">
+              Los campos marcados con <span className="text-red-500 font-bold ml-0.5">*</span> son obligatorios.
+            </p>
+
             {saveError && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-medium">
                 {saveError}
@@ -179,7 +189,7 @@ export const RequestDrawer: React.FC<RequestDrawerProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
               <div>
                 <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                  Estado
+                  Estado <span className="text-red-500 font-bold ml-0.5">*</span>
                 </label>
                 <div className={`relative flex items-center justify-between text-xs font-medium rounded-lg px-3 py-2 border ${statusColorClass}`}>
                   <div className="flex items-center gap-2 w-full">
@@ -200,7 +210,7 @@ export const RequestDrawer: React.FC<RequestDrawerProps> = ({
 
               <div>
                 <label className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
-                  Prioridad
+                  Prioridad <span className="text-red-500 font-bold ml-0.5">*</span>
                 </label>
                 <div className={`relative flex items-center justify-between text-xs font-medium rounded-lg px-3 py-2 border ${priorityColorClass}`}>
                   <div className="flex items-center gap-2 w-full">
@@ -223,46 +233,76 @@ export const RequestDrawer: React.FC<RequestDrawerProps> = ({
             {/* Title Field */}
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1">
-                Título *
+                Título <span className="text-red-500 font-bold ml-0.5">*</span>
               </label>
               <input
                 type="text"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none focus:border-blue-500 transition-colors"
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setTouched((prev) => ({ ...prev, title: true }));
+                }}
+                onBlur={() => setTouched((prev) => ({ ...prev, title: true }))}
+                className={`w-full bg-white border rounded-lg px-3 py-2 text-xs text-slate-900 font-semibold focus:outline-none transition-colors ${
+                  titleError
+                    ? 'border-red-500 bg-red-50/20 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                    : 'border-slate-200 focus:border-blue-500'
+                }`}
                 placeholder="Título de la solicitud..."
-                required
               />
+              {titleError && (
+                <p className="mt-1 text-[11px] text-red-500 font-medium">{titleError}</p>
+              )}
             </div>
 
             {/* Description Field */}
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1">
-                Descripción *
+                Descripción <span className="text-red-500 font-bold ml-0.5">*</span>
               </label>
               <textarea
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  setTouched((prev) => ({ ...prev, description: true }));
+                }}
+                onBlur={() => setTouched((prev) => ({ ...prev, description: true }))}
                 rows={5}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-blue-500 transition-colors resize-y leading-relaxed"
+                className={`w-full bg-white border rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none transition-colors resize-y leading-relaxed ${
+                  descriptionError
+                    ? 'border-red-500 bg-red-50/20 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                    : 'border-slate-200 focus:border-blue-500'
+                }`}
                 placeholder="Descripción detallada de la solicitud..."
-                required
               />
+              {descriptionError && (
+                <p className="mt-1 text-[11px] text-red-500 font-medium">{descriptionError}</p>
+              )}
             </div>
 
             {/* Applicant Field */}
             <div>
               <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1">
-                Solicitante *
+                Solicitante <span className="text-red-500 font-bold ml-0.5">*</span>
               </label>
               <input
                 type="text"
                 value={applicant}
-                onChange={(e) => setApplicant(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-blue-500 transition-colors"
+                onChange={(e) => {
+                  setApplicant(e.target.value);
+                  setTouched((prev) => ({ ...prev, applicant: true }));
+                }}
+                onBlur={() => setTouched((prev) => ({ ...prev, applicant: true }))}
+                className={`w-full bg-white border rounded-lg px-3 py-2 text-xs text-slate-900 font-medium focus:outline-none transition-colors ${
+                  applicantError
+                    ? 'border-red-500 bg-red-50/20 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+                    : 'border-slate-200 focus:border-blue-500'
+                }`}
                 placeholder="Nombre o correo del solicitante..."
-                required
               />
+              {applicantError && (
+                <p className="mt-1 text-[11px] text-red-500 font-medium">{applicantError}</p>
+              )}
             </div>
 
             {/* Timestamps */}
