@@ -1,6 +1,6 @@
 # Sistema de Gestión de Solicitudes Internas - Arkho Technical Challenge
 
-Aplicación Fullstack para el registro, consulta y gestión de solicitudes internas con **Express.js**, **TypeScript**, **PostgreSQL 16**, **React**, **Tailwind CSS**, **pnpm** y **Docker Compose**.
+Aplicación Fullstack para el registro, consulta y gestión de solicitudes internas con **Express.js**, **TypeScript**, **PostgreSQL 16**, **React**, **Tailwind CSS**, **pnpm**, **Docker Compose** y **GitHub Actions CI/CD**.
 
 ---
 
@@ -44,94 +44,106 @@ backend/src/
 │       ├── request.repository.ts # Abstracción de persistencia SQL en PostgreSQL 16
 │       ├── request.service.ts    # Lógica de negocio y manejo de errores de dominio
 │       ├── request.controller.ts # Capa de presentación HTTP (Handlers)
-│       └── request.routes.ts     # Definición de endpoints HTTP Express
+│       └── request.routes.ts     # Definición de endpoints HTTP Express (PUT, PATCH, POST, GET)
 ├── utils/                   # Api-response para respuestas JSON estandarizadas
 ├── app.ts                   # Aplicación Express con middlewares globales
 └── server.ts                # Inicializador del servidor y la base de datos
 ```
 
 ### Capas del Backend
-1. **Routes**: Define los endpoints de la API (`POST`, `GET`, `PATCH`) integrando el middleware reutilizable de validación DTO.
+1. **Routes**: Define los endpoints de la API (`POST`, `GET`, `PUT`, `PATCH`) integrando el middleware reutilizable de validación DTO.
 2. **Controller**: Intercepta la petición HTTP, delega la lógica de negocio y responde con una estructura unificada JSON.
-3. **Service**: Contiene las reglas de negocio (ej. validación de existencia antes de actualizar estado).
+3. **Service**: Contiene las reglas de negocio (ej. validación de existencia antes de actualizar estado o editar campos).
 4. **Repository**: Abstrae las consultas SQL parametrizadas a la base de datos PostgreSQL 16 (`pg` Pool).
 5. **Model**: Define los tipos de TypeScript, enums de prioridad (`baja`, `media`, `alta`) y estados (`pendiente`, `en_proceso`, `completada`).
-6. **Validation**: Reglas de validación declarativas utilizando esquemas **Zod** (`createRequestSchema`, `updateRequestStatusSchema`).
+6. **Validation**: Reglas de validación declarativas utilizando esquemas **Zod** (`createRequestSchema`, `updateRequestSchema`, `updateRequestStatusSchema`).
 7. **Middleware**:
    - `validation.middleware.ts`: Intercepta y valida de forma genérica el body, params o query contra cualquier DTO.
    - `error.middleware.ts`: Captura global de excepciones con códigos HTTP limpios (`400`, `404`, `500`).
 
 ---
 
-## 📮 Pruebas de API con Postman
+## Características Destacadas del Frontend
+
+- **Tablero Kanban Jira**: Vista con columnas interactivo (*Pendientes*, *En proceso*, *Completadas*) con Drag & Drop nativo entre columnas.
+- **Panel Drawer Lateral**: Visualizador y editor completo de solicitudes (Título, Descripción, Solicitante, Estado, Prioridad) conservando el número de ticket (`REQ-XXXX`) en modo seguro de solo lectura.
+- **Sistema de Notificaciones Toast**: Notificaciones estilo Ant Design (`message.success`) en la parte superior central con temporizador de auto-cierre.
+- **Diseño de Etiquetas de Color Tag**: Indicadores con cuadros de color personalizados (`#94A3B8` Pendiente, `#FCD34D` En proceso, `#86EFAC` Completada, `#F87171` Alta).
+- **100% Responsivo**: Layout optimizado con scroll horizontal continuo de columnas en móviles y tarjetas con altura dinámica (`min-h-[180px] h-auto`) para evitar desbordamientos.
+
+---
+
+## Pruebas de API con Postman
 
 En la raíz del proyecto se incluye la colección oficial de Postman:
-📄 `arkho_requests.postman_collection.json`
+`arkho_requests.postman_collection.json`
 
 ### Endpoints Incluidos
 - `GET http://localhost:4005/api/v1/requests`: Obtiene la lista de solicitudes.
 - `POST http://localhost:4005/api/v1/requests`: Crea una nueva solicitud con estado por defecto `pendiente`.
-- `POST http://localhost:4005/api/v1/requests` *(Error validation test)*: Prueba del middleware de validación DTO al enviar campos inválidos (retorna `400 Bad Request`).
+- `PUT http://localhost:4005/api/v1/requests/:id`: Edición completa de los datos de la solicitud.
 - `PATCH http://localhost:4005/api/v1/requests/:id/status`: Actualiza el estado a `en_proceso` o `completada`.
+- `PATCH http://localhost:4005/api/v1/requests/:id/priority`: Cambia la prioridad de una solicitud.
 
 ---
 
-## 🧪 Pruebas Automatizadas (pnpm)
+## Pruebas Automatizadas y CI/CD
 
-El backend incluye pruebas unitarias para la capa de servicios y repositorios usando **Jest**.
-
-Para ejecutarlas de manera local usando `pnpm`:
-
+### Pruebas Unitarias Backend
 ```bash
 cd backend
-pnpm install
 pnpm test
 ```
 
+### GitHub Actions CI/CD Pipeline
+El repositorio cuenta con integración continua configurada en `.github/workflows/ci.yml` que valida:
+1. Compilación de TypeScript y suite de pruebas unitarias Jest en backend.
+2. Build de producción de Vite en frontend.
+3. Validación sintáctica de contenedores Docker Compose.
+
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 - **Gestor de Paquetes**: `pnpm`
 - **Backend**: Express.js, TypeScript, PostgreSQL 16 (`pg`), Zod (DTO Validation), Jest.
-- **Frontend**: React 18, Vite, TypeScript, Tailwind CSS, Lucide Icons.
-- **Infraestructura**: Docker, Docker Compose, Nginx (frontend runner), PostgreSQL 16 Alpine.
+- **Frontend**: React 18, Vite, TypeScript, Tailwind CSS.
+- **Infraestructura & CI/CD**: Docker, Docker Compose, Nginx, GitHub Actions CI.
 
 ---
 
-## 💡 Supuestos Realizados y Alcance
+## Supuestos Realizados y Alcance
 
-- **Supuesto 1**: No se requiere autenticación de usuarios en esta primera versión (acceso público interno).
-- **Supuesto 2**: Al crear una solicitud, su estado inicial siempre inicia en `pendiente`.
-- **Supuesto 3**: Las fechas de creación y actualización son manejadas por el motor de base de datos con timestamps UTC.
+- **Supuesto 1**: El acceso actual es interno y público dentro de la organización (sin requerir autenticación JWT).
+- **Supuesto 2**: Al crear una solicitud, su estado inicial por defecto es `pendiente`.
+- **Supuesto 3**: El código de ticket (`REQ-XXXX`) funciona como identificador inmutable de referencia rápida para los usuarios.
 
 ---
 
-## 📋 Funcionalidades Completadas vs Pendientes
+## Funcionalidades Completadas vs Pendientes
 
-### ✅ Completadas
+### Completadas
 - [x] Contenerización total con Docker Compose (Postgres 16, Backend, Frontend).
-- [x] Integración de `pnpm` como gestor de paquetes para backend, frontend y Dockerfiles.
-- [x] Creación de solicitudes desde el frontend con formulario validado.
-- [x] Listado de solicitudes registradas ordenadas por fecha.
-- [x] Badges visuales de prioridad y estado con código de colores.
-- [x] Cambio interactivo de estado (`pendiente` -> `en_proceso` -> `completada`) en tiempo real.
-- [x] Validación de campos obligatorios en cliente y backend (DTOs Zod).
-- [x] Mensajes de error claros e indicadores de carga.
-- [x] Filtros por estado, prioridad y buscador por texto.
-- [x] Pruebas unitarias automatizadas.
+- [x] Pipeline de CI/CD automatizado con GitHub Actions.
+- [x] Tablero Kanban estilo Jira con Drag & Drop entre columnas.
+- [x] Panel Drawer lateral para inspección y edición de campos.
+- [x] Notificaciones Toast con estilo Ant Design.
+- [x] Diseño responsivo adaptado a teléfonos, tablets y escritorios.
+- [x] Creación, actualización completa, filtrado y búsqueda de solicitudes.
+- [x] Badges de estado/prioridad con etiquetas de cuadros de color.
+- [x] Pruebas unitarias automatizadas con Jest.
 
-### ⏳ Pendientes / Próximos Pasos (Con más tiempo)
-- [ ] **Autenticación y Autorización**: Integración de JWT y roles (Solicitante / Administrador).
-- [ ] **Notificaciones**: Notificar vía WebSocket o Server-Sent Events (SSE) cuando cambia el estado de una solicitud.
-- [ ] **Asignación de Responsable**: Permitir asignar a un usuario del equipo para resolver la solicitud.
-- [ ] **Comentarios**: Sistema de hilo de comentarios dentro de cada solicitud.
+### Pendientes / Próximos Pasos (Para llevar a Producción)
+- [ ] **Autenticación y Autorización**: Integración de JWT y roles (Solicitante / Administrador / Agente).
+- [ ] **Notificaciones**: Notificaciones vía WebSockets o Server-Sent Events (SSE) en tiempo real al cambiar estados.
+- [ ] **Asignación de Responsable**: Asignar agentes específicos para la atención de tickets.
+- [ ] **Historial de Comentarios**: Secciones de comentarios y registros de auditoría por ticket.
 
 ---
 
-## 🤖 Uso de Inteligencia Artificial (Transparencia)
+## Uso de Inteligencia Artificial (Transparencia)
 
 De acuerdo con las pautas del desafío:
-- **Para qué se utilizó**: Generación de la estructura base modular, plantillas de Docker multi-stage y estilos de Tailwind CSS.
-- **Partes revisadas y modificadas**: Se ajustaron manualmente los esquemas DTO de Zod, el middleware de validación, la consulta SQL parametrizada de PostgreSQL, el cambio a `pnpm` y la reconfiguración de puertos para evitar conflictos en la máquina del usuario.
-- **Validación realizada**: Se verificaron los tipos de TypeScript (`tsc`), se ejecutaron las pruebas unitarias con `jest` y se comprobó la interoperabilidad del contenedor `docker-compose`.
+- **Para qué se utilizó**: Generación inicial de la estructura modular, maquetado rápido de componentes UI con Tailwind CSS y estructuración del archivo workflow de GitHub Actions.
+- **Partes revisadas y modificadas**: Se reescribió la arquitectura del Tablero Kanban a Drag & Drop nativo de HTML5 para eliminar fallos de duplicación DOM, se implementaron las consultas parametrizadas SQL con `COALESCE` en PostgreSQL 16, se crearon los componentes responsivos con notificaciones Toast y se ajustó la configuración de Docker Compose.
+- **Validación realizada**: Se verificaron los tipos de TypeScript (`tsc --noEmit`), se ejecutaron las pruebas unitarias con `jest`, se validó la sintaxis del contenedor Docker y se comprobó la ejecución completa en el pipeline de GitHub Actions.
