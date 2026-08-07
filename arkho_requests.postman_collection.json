@@ -1,0 +1,160 @@
+{
+	"info": {
+		"_postman_id": "a9b3c4d5-e6f7-4a1b-8c2d-3e4f5a6b7c8d",
+		"name": "Arkho - Gestión de Solicitudes Internas",
+		"description": "Colección de pruebas para la API de Gestión de Solicitudes Internas (Backend Express + PostgreSQL 16)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Listar Solicitudes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4005/api/v1/requests",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4005",
+					"path": [
+						"api",
+						"v1",
+						"requests"
+					]
+				},
+				"description": "Obtiene la lista de solicitudes internas registradas ordenadas por fecha."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Crear Solicitud (Éxito)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Aprobación de Licencia de Software IDE\",\n  \"description\": \"Se solicita la compra de 5 licencias de IDE para el equipo de backend.\",\n  \"applicant\": \"carlos.mendoza@empresa.com\",\n  \"priority\": \"alta\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:4005/api/v1/requests",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4005",
+					"path": [
+						"api",
+						"v1",
+						"requests"
+					]
+				},
+				"description": "Crea una nueva solicitud interna con estado por defecto 'pendiente'."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Crear Solicitud (Error de Validación DTO)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"\",\n  \"description\": \"Faltan datos obligatorios\",\n  \"priority\": \"super_alta\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:4005/api/v1/requests",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4005",
+					"path": [
+						"api",
+						"v1",
+						"requests"
+					]
+				},
+				"description": "Prueba del middleware de validación DTO al enviar campos inválidos/faltantes (Retorna 400 Bad Request)."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Cambiar Estado a 'en_proceso'",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"status\": \"en_proceso\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:4005/api/v1/requests/REPLACE_WITH_UUID/status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4005",
+					"path": [
+						"api",
+						"v1",
+						"requests",
+						"REPLACE_WITH_UUID",
+						"status"
+					]
+				},
+				"description": "Actualiza el estado de una solicitud existente."
+			},
+			"response": []
+		},
+		{
+			"name": "5. Cambiar Estado a 'completada'",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"status\": \"completada\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:4005/api/v1/requests/REPLACE_WITH_UUID/status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4005",
+					"path": [
+						"api",
+						"v1",
+						"requests",
+						"REPLACE_WITH_UUID",
+						"status"
+					]
+				},
+				"description": "Actualiza el estado de una solicitud a 'completada'."
+			},
+			"response": []
+		}
+	]
+}

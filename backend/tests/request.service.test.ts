@@ -1,0 +1,124 @@
+import { RequestService } from '../src/modules/requests/request.service';
+import { RequestRepository } from '../src/modules/requests/request.repository';
+import { InternalRequest } from '../src/modules/requests/request.model';
+import { AppError } from '../src/middlewares/error.middleware';
+
+// Mock de RequestRepository
+jest.mock('../src/modules/requests/request.repository');
+
+describe('RequestService Unit Tests', () => {
+  let service: RequestService;
+  let mockRepository: jest.Mocked<RequestRepository>;
+
+  const mockRequest: InternalRequest = {
+    id: '123e4567-e89b-12d3-a456-426614174000',
+    title: 'Solicitud de prueba',
+    description: 'Descripción de prueba unitaria',
+    applicant: 'test@empresa.com',
+    priority: 'alta',
+    status: 'pendiente',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+
+  beforeEach(() => {
+    mockRepository = new RequestRepository() as jest.Mocked<RequestRepository>;
+    service = new RequestService(mockRepository);
+  });
+
+  describe('getAllRequests', () => {
+    it('debe retornar la lista de solicitudes obtenida del repositorio', async () => {
+      mockRepository.findAll.mockResolvedValue([mockRequest]);
+
+      const result = await service.getAllRequests();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('Solicitud de prueba');
+      expect(mockRepository.findAll).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getRequestById', () => {
+    it('debe retornar una solicitud si existe', async () => {
+      mockRepository.findById.mockResolvedValue(mockRequest);
+
+      const result = await service.getRequestById(mockRequest.id);
+
+      expect(result).toEqual(mockRequest);
+      expect(mockRepository.findById).toHaveBeenCalledWith(mockRequest.id);
+    });
+
+    it('debe lanzar AppError 404 si la solicitud no existe', async () => {
+      mockRepository.findById.mockResolvedValue(null);
+
+      await expect(service.getRequestById('id-inexistente')).rejects.toThrow(AppError);
+      await expect(service.getRequestById('id-inexistente')).rejects.toThrow('no encontrada');
+    });
+  });
+
+  describe('createRequest', () => {
+    it('debe crear una nueva solicitud correctamente', async () => {
+      const inputData = {
+        title: 'Nueva solicitud',
+        description: 'Detalle de la nueva solicitud',
+        applicant: 'juan@empresa.com',
+        priority: 'media' as const
+      };
+
+      mockRepository.create.mockResolvedValue({
+        ...mockRequest,
+        ...inputData
+      });
+
+      const result = await service.createRequest(inputData);
+
+      expect(result.title).toBe(inputData.title);
+      expect(result.priority).toBe('media');
+      expect(mockRepository.create).toHaveBeenCalledWith(inputData);
+    });
+  });
+
+  describe('updateRequestStatus', () => {
+    it('debe actualizar el estado de una solicitud existente', async () => {
+      mockRepository.findById.mockResolvedValue(mockRequest);
+      mockRepository.updateStatus.mockResolvedValue({
+        ...mockRequest,
+        status: 'en_proceso'
+      });
+
+      const result = await service.updateRequestStatus(mockRequest.id, 'en_proceso');
+
+      expect(result.status).toBe('en_proceso');
+      expect(mockRepository.updateStatus).toHaveBeenCalledWith(mockRequest.id, 'en_proceso');
+    });
+
+    it('debe lanzar AppError 404 si se intenta actualizar una solicitud inexistente', async () => {
+      mockRepository.findById.mockResolvedValue(null);
+
+      await expect(service.updateRequestStatus('id-inexistente', 'completada')).rejects.toThrow(AppError);
+      await expect(service.updateRequestStatus('id-inexistente', 'completada')).rejects.toThrow('no existe');
+    });
+  });
+
+  describe('updateRequestPriority', () => {
+    it('debe actualizar la prioridad de una solicitud existente', async () => {
+      mockRepository.findById.mockResolvedValue(mockRequest);
+      mockRepository.updatePriority.mockResolvedValue({
+        ...mockRequest,
+        priority: 'baja'
+      });
+
+      const result = await service.updateRequestPriority(mockRequest.id, 'baja');
+
+      expect(result.priority).toBe('baja');
+      expect(mockRepository.updatePriority).toHaveBeenCalledWith(mockRequest.id, 'baja');
+    });
+
+    it('debe lanzar AppError 404 si se intenta actualizar la prioridad de una solicitud inexistente', async () => {
+      mockRepository.findById.mockResolvedValue(null);
+
+      await expect(service.updateRequestPriority('id-inexistente', 'alta')).rejects.toThrow(AppError);
+      await expect(service.updateRequestPriority('id-inexistente', 'alta')).rejects.toThrow('no existe');
+    });
+  });
+});

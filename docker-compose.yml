@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: arkho_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: arkho_user
+      POSTGRES_PASSWORD: arkho_password
+      POSTGRES_DB: arkho_db
+    ports:
+      - '5439:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U arkho_user -d arkho_db']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: arkho_backend
+  #   restart: always
+  #   environment:
+  #     PORT: 4000
+  #     NODE_ENV: production
+  #     DATABASE_URL: postgres://arkho_user:arkho_password@postgres:5432/arkho_db
+  #     CORS_ORIGIN: '*'
+  #   ports:
+  #     - '4005:4000'
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: arkho_frontend
+  #   restart: always
+  #   ports:
+  #     - '5176:80'
+  #   depends_on:
+  #     - backend
+
+volumes:
+  postgres_data:
