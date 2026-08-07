@@ -147,15 +147,22 @@ El repositorio cuenta con integración continua configurada en `.github/workflow
 
 ---
 
-## Uso de Inteligencia Artificial (Transparencia)
+## Uso de Inteligencia Artificial (Transparencia & Auditoría)
 
-De acuerdo con las pautas del desafío, el uso de herramientas de Inteligencia Artificial fue clave para acelerar la entrega y mantener altos estándares de calidad:
+De acuerdo con las pautas del desafío, el uso de herramientas de Inteligencia Artificial (IA) se asumió de manera transparente como un **copiloto de productividad moderna**, permitiendo elevar la velocidad de desarrollo y la calidad final de la entrega.
 
-- **Estructuración y Boilerplate**: Generación acelerada de interfaces de TypeScript, DTOs de Zod, endpoints CRUD en Express y archivos de configuración iniciales (Tailwind CSS, Docker Compose y GitHub Actions).
-- **Pruebas Automatizadas con Jest**: Asistencia en la redacción de suites de pruebas unitarias y generación de mocks para repositorios, alcanzando una cobertura de código del **99.02%**.
-- **Maquetado UI, Responsividad y Tailwind**: Asistencia en la construcción del diseño responsivo con Tailwind CSS, optimización de componentes React y adaptación a dispositivos móviles (tarjetas dinámicas `min-h-[180px]` y scroll de columnas).
-- **Lógica de Drag & Drop**: Ayuda en la arquitectura del tablero Kanban sustituyendo librerías externas con manipulación directa del DOM por Drag and Drop nativo de HTML5 (`onDragOver`, `onDrop`) en React.
-- **Validaciones de Seguridad**: Definición estricta de esquemas de validación con **Zod** para sanear entradas tanto en el cuerpo HTTP como en los parámetros de ruta (`UUID`).
+### ❓ ¿Por qué se utilizó?
+Para optimizar el tiempo de desarrollo de 4 horas, reduciendo el tiempo invertido en código repetitivo (*boilerplate*) y permitiendo enfocar la mayor parte del esfuerzo en la **arquitectura backend, seguridad con Zod, persistencia real con PostgreSQL 16 y excelencia en la UX/UI**.
 
-### Supervisión y Control Humano (Auditoría)
-Todo el código sugerido por IA fue minuciosamente **revisado, adaptado, auditado y probado manualmente**. Se ejecutó la verificación estricta de tipos de TypeScript (`tsc --noEmit`), la suite completa de Jest (`pnpm test:coverage`) y la validación de despliegue en contenedores Docker.
+### 🛠️ ¿En qué y cómo se utilizó?
+Se utilizó en modalidad de *pair programming* guiado continuamente por el desarrollador para:
+- **Escribir Pruebas Automatizadas**: Redacción asistida de las 38 pruebas unitarias en Jest con mocks para repositorios y BD.
+- **Boilerplate y Estructura**: Generación acelerada de DTOs con Zod, interfaces TypeScript, controladores y configuración del pipeline de GitHub Actions CI.
+- **Ajustes de UI y Tailwind CSS**: Asistencia en clases de Tailwind para diseño responsivo, badges de color y notificaciones Toast estilo Ant Design.
+- **Arquitectura Kanban**: Apoyo en la transición de librerías externas manipula-DOM a la arquitectura de **Drag and Drop nativo de HTML5** en React.
+
+### 👨‍💻 Liderazgo, Auditoría y Modificaciones del Desarrollador
+La IA actuó estrictamente como un asistente bajo la **dirección, supervisión y auditoría del desarrollador**:
+1. **Definición de Requerimientos y Criterios**: El desarrollador definió las decisiones de arquitectura (Vertical Slices, PostgreSQL, Docker Compose, drawer de edición y notificaciones).
+2. **Revisión y Ajustes Manuales**: El desarrollador corrigió activamente la lógica del estado en React para eliminar duplicación de tarjetas en el Drag & Drop, ajustó los comportamientos responsivos móviles y perfeccionó las consultas SQL parametrizadas.
+3. **Validación Estricta**: Cada bloque de código fue compilado (`tsc --noEmit`), ejecutado en la suite de Jest (`pnpm test:coverage`) y probado en vivo dentro de los contenedores Docker.
