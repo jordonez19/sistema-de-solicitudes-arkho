@@ -132,6 +132,25 @@ export function App() {
     }
   };
 
+  const handleDeleteRequest = async (id: string) => {
+    // 1. Optimistic update in React state
+    setRequests((prev) => prev.filter((r) => r.id !== id));
+    if (selectedRequest && selectedRequest.id === id) {
+      setSelectedRequest(null);
+    }
+
+    try {
+      // 2. Persist deletion in backend API
+      await apiService.deleteRequest(id);
+      showToast('Solicitud eliminada correctamente', 'success');
+    } catch (err) {
+      console.error('Error al eliminar solicitud:', err);
+      showToast('Error al eliminar la solicitud', 'error');
+      fetchRequests();
+      throw err;
+    }
+  };
+
   // Filtered requests logic con normalización de tildes y caracteres
   const normalizedQuery = normalizeText(searchTerm);
 
@@ -292,6 +311,7 @@ export function App() {
         request={selectedRequest}
         onClose={() => setSelectedRequest(null)}
         onUpdateRequest={handleUpdateRequest}
+        onDeleteRequest={handleDeleteRequest}
       />
 
       {/* Antd Style Toast Notifications */}

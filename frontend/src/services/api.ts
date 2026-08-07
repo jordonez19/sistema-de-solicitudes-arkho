@@ -80,5 +80,16 @@ export const apiService = {
       throw new Error(json.message || 'Error al actualizar la solicitud');
     }
     return json.data;
+  },
+
+  async deleteRequest(id: string): Promise<void> {
+    const response = await fetch(`${API_URL}/requests/${id}`, {
+      method: 'DELETE'
+    });
+
+    const json: ApiResponse<null> = await response.json();
+    if (!response.ok || !json.success) {
+      throw new Error(json.message || 'Error al eliminar la solicitud');
+    }
   }
 };

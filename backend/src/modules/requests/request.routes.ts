@@ -5,7 +5,8 @@ import {
   createRequestSchema,
   updateRequestStatusSchema,
   updateRequestPrioritySchema,
-  updateRequestSchema
+  updateRequestSchema,
+  deleteRequestSchema
 } from './request.validation';
 
 const router = Router();
@@ -28,5 +29,8 @@ router.patch('/:id/status', validateDto(updateRequestStatusSchema), controller.u
 
 // PATCH /api/v1/requests/:id/priority - Cambiar prioridad de solicitud (con validación DTO)
 router.patch('/:id/priority', validateDto(updateRequestPrioritySchema), controller.updatePriority);
+
+// DELETE /api/v1/requests/:id - Eliminar solicitud (con validación DTO)
+router.delete('/:id', validateDto(deleteRequestSchema), controller.delete);
 
 export default router;

@@ -62,4 +62,16 @@ export class RequestService {
 
     return updated;
   }
+
+  async deleteRequest(id: string): Promise<void> {
+    const existing = await this.repository.findById(id);
+    if (!existing) {
+      throw new AppError(`No se puede eliminar. Solicitud con ID '${id}' no existe.`, 404);
+    }
+
+    const deleted = await this.repository.delete(id);
+    if (!deleted) {
+      throw new AppError('Error al eliminar la solicitud', 500);
+    }
+  }
 }

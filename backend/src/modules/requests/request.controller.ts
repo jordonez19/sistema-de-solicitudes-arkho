@@ -64,4 +64,14 @@ export class RequestController {
       next(error);
     }
   };
+
+  delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      await this.service.deleteRequest(id);
+      ApiResponse.success(res, null, 'Solicitud eliminada correctamente');
+    } catch (error) {
+      next(error);
+    }
+  };
 }

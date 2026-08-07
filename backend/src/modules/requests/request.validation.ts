@@ -58,3 +58,9 @@ export const updateRequestSchema = z.object({
     status: z.enum(['pendiente', 'en_proceso', 'completada']).optional()
   })
 });
+
+export const deleteRequestSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('El ID debe ser un UUID válido')
+  })
+});

@@ -5,12 +5,14 @@ interface RequestDrawerProps {
   request: InternalRequest | null;
   onClose: () => void;
   onUpdateRequest: (id: string, data: Partial<InternalRequest>) => Promise<void>;
+  onDeleteRequest?: (id: string) => Promise<void>;
 }
 
 export const RequestDrawer: React.FC<RequestDrawerProps> = ({
   request,
   onClose,
-  onUpdateRequest
+  onUpdateRequest,
+  onDeleteRequest
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -19,6 +21,8 @@ export const RequestDrawer: React.FC<RequestDrawerProps> = ({
   const [priority, setPriority] = useState<RequestPriority>('media');
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -31,10 +35,23 @@ export const RequestDrawer: React.FC<RequestDrawerProps> = ({
       setPriority(request.priority);
       setSaveError(null);
       setSaveSuccess(false);
+      setIsConfirmingDelete(false);
     }
   }, [request]);
 
   if (!request) return null;
+
+  const handleDelete = async () => {
+    if (!onDeleteRequest || !request) return;
+    try {
+      setIsDeleting(true);
+      await onDeleteRequest(request.id);
+      onClose();
+    } catch (err: any) {
+      setSaveError(err.message || 'Error al eliminar la solicitud');
+      setIsDeleting(false);
+    }
+  };
 
   const shortId = `REQ-${request.id.slice(0, 4).toUpperCase()}`;
 
@@ -271,22 +288,60 @@ export const RequestDrawer: React.FC<RequestDrawerProps> = ({
           </form>
 
           {/* Drawer Footer */}
-          <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-100 transition-colors shadow-2xs"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={isSaving}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors shadow-2xs disabled:opacity-50 flex items-center gap-1.5"
-            >
-              {isSaving ? 'Guardando...' : 'Guardar Cambios'}
-            </button>
+          <div className="px-5 sm:px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex flex-wrap items-center justify-between gap-2">
+            {!isConfirmingDelete ? (
+              <>
+                {onDeleteRequest && (
+                  <button
+                    type="button"
+                    onClick={() => setIsConfirmingDelete(true)}
+                    className="px-3 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 border border-red-200 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5"
+                  >
+                    🗑 Eliminar Solicitud
+                  </button>
+                )}
+                <div className="flex items-center gap-2 ml-auto">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-100 transition-colors shadow-2xs"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors shadow-2xs disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="w-full bg-red-50 border border-red-200 rounded-lg p-3 flex flex-wrap items-center justify-between gap-2 animate-fade-in">
+                <span className="text-xs font-medium text-red-800">
+                  ¿Estás seguro de eliminar esta solicitud?
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsConfirmingDelete(false)}
+                    className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 text-xs font-semibold rounded-md hover:bg-slate-100 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
+                  >
+                    {isDeleting ? 'Eliminando...' : 'Sí, Eliminar'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

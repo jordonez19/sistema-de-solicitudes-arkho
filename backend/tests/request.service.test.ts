@@ -176,4 +176,31 @@ describe('RequestService Unit Tests', () => {
       await expect(service.updateRequest(mockRequest.id, { title: 'Nuevo' })).rejects.toThrow('Error al actualizar la solicitud');
     });
   });
+
+  describe('deleteRequest', () => {
+    it('debe eliminar una solicitud existente correctamente', async () => {
+      mockRepository.findById.mockResolvedValue(mockRequest);
+      mockRepository.delete.mockResolvedValue(true);
+
+      await service.deleteRequest(mockRequest.id);
+
+      expect(mockRepository.findById).toHaveBeenCalledWith(mockRequest.id);
+      expect(mockRepository.delete).toHaveBeenCalledWith(mockRequest.id);
+    });
+
+    it('debe lanzar AppError 404 si se intenta eliminar una solicitud inexistente', async () => {
+      mockRepository.findById.mockResolvedValue(null);
+
+      await expect(service.deleteRequest('id-inexistente')).rejects.toThrow(AppError);
+      await expect(service.deleteRequest('id-inexistente')).rejects.toThrow('no existe');
+    });
+
+    it('debe lanzar AppError 500 si la eliminación falla en BD', async () => {
+      mockRepository.findById.mockResolvedValue(mockRequest);
+      mockRepository.delete.mockResolvedValue(false);
+
+      await expect(service.deleteRequest(mockRequest.id)).rejects.toThrow(AppError);
+      await expect(service.deleteRequest(mockRequest.id)).rejects.toThrow('Error al eliminar la solicitud');
+    });
+  });
 });

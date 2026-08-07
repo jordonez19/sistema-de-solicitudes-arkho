@@ -127,4 +127,10 @@ export class RequestRepository {
     const { rows } = await pool.query(query, values);
     return rows[0] || null;
   }
+
+  async delete(id: string): Promise<boolean> {
+    const query = `DELETE FROM internal_requests WHERE id = $1;`;
+    const { rowCount } = await pool.query(query, [id]);
+    return (rowCount ?? 0) > 0;
+  }
 }

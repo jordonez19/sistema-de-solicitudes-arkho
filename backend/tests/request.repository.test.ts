@@ -148,4 +148,26 @@ describe('RequestRepository Unit Tests', () => {
       expect(result).toBeNull();
     });
   });
+
+  describe('delete', () => {
+    it('debe eliminar la fila y retornar true si rowCount > 0', async () => {
+      mockPoolQuery.mockResolvedValue({ rowCount: 1 });
+
+      const result = await repository.delete(mockDbRow.id);
+
+      expect(result).toBe(true);
+      expect(mockPoolQuery).toHaveBeenCalledWith(
+        expect.stringContaining('DELETE FROM internal_requests WHERE id = $1'),
+        [mockDbRow.id]
+      );
+    });
+
+    it('debe retornar false si no se eliminó ninguna fila (rowCount = 0)', async () => {
+      mockPoolQuery.mockResolvedValue({ rowCount: 0 });
+
+      const result = await repository.delete('id-inexistente');
+
+      expect(result).toBe(false);
+    });
+  });
 });
