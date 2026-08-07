@@ -16,7 +16,7 @@ cd /home/xavi/Desktop/arkho
 docker-compose up --build
 ```
 
-### 🌐 Servicios Disponibles (Puertos Configurados)
+### Servicios Disponibles (Puertos Configurados)
 
 Se asignaron **puertos no en conflicto** para evitar interferencias con otras aplicaciones o bases de datos locales:
 
@@ -28,7 +28,7 @@ Se asignaron **puertos no en conflicto** para evitar interferencias con otras ap
 
 ---
 
-## 🏛️ Arquitectura y Decisiones Técnicas
+## Arquitectura y Decisiones Técnicas
 
 El proyecto sigue una **Estructura Modular orientada a Dominios (*Vertical Slices*)**, garantizando una clara separación de responsabilidades:
 
