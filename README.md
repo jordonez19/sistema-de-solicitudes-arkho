@@ -147,22 +147,22 @@ El repositorio cuenta con integración continua configurada en `.github/workflow
 
 ---
 
-## Uso de Inteligencia Artificial (Transparencia & Auditoría)
+## Uso de Inteligencia Artificial (Transparencia, Criterio & Auditoría)
 
-De acuerdo con las pautas del desafío, el uso de herramientas de Inteligencia Artificial (IA) se asumió de manera transparente como un **copiloto de productividad moderna**, permitiendo elevar la velocidad de desarrollo y la calidad final de la entrega.
+De acuerdo con las pautas del desafío, el uso de herramientas de Inteligencia Artificial (IA) se asumió de manera transparente como un **multiplicador de productividad y copiloto de ingeniería**, enfocado en maximizar la calidad y acelerar el tiempo de desarrollo.
 
 ### ❓ ¿Por qué se utilizó?
-Para optimizar el tiempo de desarrollo de 4 horas, reduciendo el tiempo invertido en código repetitivo (*boilerplate*) y permitiendo enfocar la mayor parte del esfuerzo en la **arquitectura backend, seguridad con Zod, persistencia real con PostgreSQL 16 y excelencia en la UX/UI**.
+Para optimizar el tiempo de desarrollo de 4 horas, eliminando la fricción de escribir código repetitivo (*boilerplate*) y permitiendo enfocar la mayor parte del esfuerzo humano en la **arquitectura backend, seguridad estricta con Zod, persistencia real en PostgreSQL 16 y excelencia en la experiencia de usuario (UX/UI)**.
 
 ### 🛠️ ¿En qué y cómo se utilizó?
-Se utilizó en modalidad de *pair programming* guiado continuamente por el desarrollador para:
-- **Escribir Pruebas Automatizadas**: Redacción asistida de las 38 pruebas unitarias en Jest con mocks para repositorios y BD.
-- **Boilerplate y Estructura**: Generación acelerada de DTOs con Zod, interfaces TypeScript, controladores y configuración del pipeline de GitHub Actions CI.
-- **Ajustes de UI y Tailwind CSS**: Asistencia en clases de Tailwind para diseño responsivo, badges de color y notificaciones Toast estilo Ant Design.
-- **Arquitectura Kanban**: Apoyo en la transición de librerías externas manipula-DOM a la arquitectura de **Drag and Drop nativo de HTML5** en React.
+Se utilizó en modalidad de *pair programming* guiado paso a paso por las directrices del desarrollador para:
+- **Escribir Pruebas Automatizadas**: Redacción acelerada de 38 pruebas unitarias con Jest y mocks de BD, alcanzando un **99.02% de cobertura de código**.
+- **Boilerplate y Configuración**: Generación inicial de interfaces TypeScript, DTOs de Zod, controladores Express y configuraciones de Tailwind CSS, Docker Compose y GitHub Actions CI.
+- **Maquetado UI y Ajustes de Responsividad**: Asistencia en clases utilitarias de Tailwind CSS para la adaptación móvil (tarjetas dinámicas `min-h-[180px]` y scroll de columnas).
+- **Lógica de Drag & Drop**: Apoyo en la arquitectura del tablero Kanban sustituyendo librerías manipuladoras de DOM por Drag and Drop nativo de HTML5 en React.
 
-### 👨‍💻 Liderazgo, Auditoría y Modificaciones del Desarrollador
-La IA actuó estrictamente como un asistente bajo la **dirección, supervisión y auditoría del desarrollador**:
-1. **Definición de Requerimientos y Criterios**: El desarrollador definió las decisiones de arquitectura (Vertical Slices, PostgreSQL, Docker Compose, drawer de edición y notificaciones).
-2. **Revisión y Ajustes Manuales**: El desarrollador corrigió activamente la lógica del estado en React para eliminar duplicación de tarjetas en el Drag & Drop, ajustó los comportamientos responsivos móviles y perfeccionó las consultas SQL parametrizadas.
-3. **Validación Estricta**: Cada bloque de código fue compilado (`tsc --noEmit`), ejecutado en la suite de Jest (`pnpm test:coverage`) y probado en vivo dentro de los contenedores Docker.
+### 👨‍💻 Liderazgo Técnico, Auditoría y Modificaciones del Desarrollador
+La IA actuó exclusivamente bajo la **dirección, supervisión y auditoría del desarrollador**:
+1. **Definición de Requerimientos**: El desarrollador estableció la visión del producto, los supuestos de negocio y las decisiones de arquitectura (Vertical Slices, PostgreSQL 16, Docker Compose, Drawer de edición y Toasts estilo Ant Design).
+2. **Revisión y Ajustes Manuales**: El desarrollador corrigió activamente la lógica de estado en React para eliminar duplicaciones de tarjetas en el Kanban, ajustó los selectores nativos en móviles para evitar desfases visuales y perfeccionó las consultas SQL parametrizadas con `COALESCE`.
+3. **Validación y Pruebas Reales**: Cada propuesta de código fue auditada, compilada estrictamente (`tsc --noEmit`), probada mediante Jest (`pnpm test:coverage`) y verificada en vivo en los contenedores contenerizados con Docker Compose.
