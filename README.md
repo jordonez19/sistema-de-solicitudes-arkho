@@ -1,4 +1,4 @@
-# Sistema de Gestión de Solicitudes Internas - Arkho Technical Challenge
+# Sistema de Gestión de Solicitudes Internas
 
 Aplicación Fullstack para el registro, consulta y gestión de solicitudes internas con **Express.js**, **TypeScript**, **PostgreSQL 16**, **React**, **Tailwind CSS**, **pnpm**, **Docker Compose** y **GitHub Actions CI/CD**.
 
@@ -6,19 +6,17 @@ Aplicación Fullstack para el registro, consulta y gestión de solicitudes inter
 
 ## Inicio Rápido con Docker Compose
 
-Toda la solución (PostgreSQL 16, Backend API y Frontend SPA) está empaquetada para levantarse con un solo comando utilizando **pnpm** internamente en las imágenes multi-stage sin requerir dependencias locales instaladas más allá de Docker.
+Toda la solución (PostgreSQL 16, Backend API y Frontend SPA) se levanta con un solo comando, sin requerir más dependencias locales que Docker.
 
 ```bash
-# 1. Clonar o acceder al directorio del proyecto
-cd /home/xavi/Desktop/arkho
-
-# 2. Levantar el entorno contenerizado (PostgreSQL 16, Express API y React)
+git clone https://github.com/jordonez19/sistema-de-solicitudes-arkho.git
+cd sistema-de-solicitudes-arkho
 docker-compose up --build
 ```
 
 ### Servicios Disponibles (Puertos Configurados)
 
-Se asignaron **puertos no en conflicto** para evitar interferencias con otras aplicaciones o bases de datos locales:
+Se asignaron **puertos no conflictivos** para evitar interferencias con otras aplicaciones o bases de datos locales:
 
 | Servicio | Puerto Interno (Contenedor) | Puerto Host (Tu Máquina) | URL de Acceso |
 | :--- | :--- | :--- | :--- |
@@ -52,117 +50,94 @@ backend/src/
 
 ### Capas del Backend
 1. **Routes**: Define los endpoints de la API (`POST`, `GET`, `PUT`, `PATCH`) integrando el middleware reutilizable de validación DTO.
-2. **Controller**: Intercepta la petición HTTP, delega la lógica de negocio y responde con una estructura unificada JSON.
+2. **Controller**: Intercepta la petición HTTP, delega la lógica de negocio y responde con una estructura JSON unificada.
 3. **Service**: Contiene las reglas de negocio (ej. validación de existencia antes de actualizar estado o editar campos).
-4. **Repository**: Abstrae las consultas SQL parametrizadas a la base de datos PostgreSQL 16 (`pg` Pool).
+4. **Repository**: Abstrae las consultas SQL parametrizadas a PostgreSQL 16 (`pg` Pool).
 5. **Model**: Define los tipos de TypeScript, enums de prioridad (`baja`, `media`, `alta`) y estados (`pendiente`, `en_proceso`, `completada`).
-6. **Validation**: Reglas de validación declarativas utilizando esquemas **Zod** (`createRequestSchema`, `updateRequestSchema`, `updateRequestStatusSchema`).
+6. **Validation**: Reglas de validación declarativas con esquemas **Zod** (`createRequestSchema`, `updateRequestSchema`, `updateRequestStatusSchema`).
 7. **Middleware**:
-   - `validation.middleware.ts`: Intercepta y valida de forma genérica el body, params o query contra cualquier DTO.
+   - `validation.middleware.ts`: Valida de forma genérica body, params o query contra cualquier DTO.
    - `error.middleware.ts`: Captura global de excepciones con códigos HTTP limpios (`400`, `404`, `500`).
 
 ---
 
-## Características Destacadas del Frontend
+## Características del Frontend
 
-- **Tablero Kanban Jira**: Vista con columnas interactivo (*Pendientes*, *En proceso*, *Completadas*) con Drag & Drop nativo entre columnas.
-- **Panel Drawer Lateral**: Visualizador y editor completo de solicitudes (Título, Descripción, Solicitante, Estado, Prioridad) conservando el número de ticket (`REQ-XXXX`) en modo seguro de solo lectura.
-- **Sistema de Notificaciones Toast**: Notificaciones estilo Ant Design (`message.success`) en la parte superior central con temporizador de auto-cierre.
-- **Diseño de Etiquetas de Color Tag**: Indicadores con cuadros de color personalizados (`#94A3B8` Pendiente, `#FCD34D` En proceso, `#86EFAC` Completada, `#F87171` Alta).
-- **100% Responsivo**: Layout optimizado con scroll horizontal continuo de columnas en móviles y tarjetas con altura dinámica (`min-h-[180px] h-auto`) para evitar desbordamientos.
+- **Tablero Kanban estilo Jira**: columnas interactivas (*Pendientes*, *En proceso*, *Completadas*) con Drag & Drop nativo entre columnas.
+- **Panel Drawer lateral**: visualizador y editor completo de solicitudes (Título, Descripción, Solicitante, Estado, Prioridad), con el número de ticket (`REQ-XXXX`) en modo solo lectura.
+- **Notificaciones Toast**: estilo Ant Design (`message.success`), centradas arriba con cierre automático.
+- **Etiquetas de color**: indicadores personalizados (`#94A3B8` Pendiente, `#FCD34D` En proceso, `#86EFAC` Completada, `#F87171` Alta).
+- **100% responsivo**: scroll horizontal de columnas en móviles y tarjetas con altura dinámica (`min-h-[180px] h-auto`) para evitar desbordamientos.
 
 ---
 
 ## Pruebas de API con Postman
 
-En la raíz del proyecto se incluye la colección oficial de Postman:
-`arkho_requests.postman_collection.json`
+En la raíz del proyecto se incluye la colección `arkho_requests.postman_collection.json`.
 
-### Endpoints Incluidos
-- `GET http://localhost:4005/api/v1/requests`: Obtiene la lista de solicitudes.
-- `POST http://localhost:4005/api/v1/requests`: Crea una nueva solicitud con estado por defecto `pendiente`.
-- `PUT http://localhost:4005/api/v1/requests/:id`: Edición completa de los datos de la solicitud.
-- `PATCH http://localhost:4005/api/v1/requests/:id/status`: Actualiza el estado a `en_proceso` o `completada`.
-- `PATCH http://localhost:4005/api/v1/requests/:id/priority`: Cambia la prioridad de una solicitud.
+### Endpoints
+- `GET http://localhost:4005/api/v1/requests`: obtiene la lista de solicitudes.
+- `POST http://localhost:4005/api/v1/requests`: crea una solicitud con estado por defecto `pendiente`.
+- `PUT http://localhost:4005/api/v1/requests/:id`: edición completa de los datos de la solicitud.
+- `PATCH http://localhost:4005/api/v1/requests/:id/status`: actualiza el estado a `en_proceso` o `completada`.
+- `PATCH http://localhost:4005/api/v1/requests/:id/priority`: cambia la prioridad de una solicitud.
 
 ---
 
 ## Pruebas Automatizadas y CI/CD
 
-### Pruebas Unitarias Backend & Cobertura de Código (>80%)
-El proyecto exige un estándar estricto de calidad de código con una **cobertura mínima requerida superior al 80%**.
+### Pruebas unitarias y cobertura
+Pruebas con Jest y mocks de la base de datos (38 pruebas, **99.02% de cobertura**). El proyecto exige una cobertura mínima del 80%.
 
 ```bash
 cd backend
-
-# Ejecutar pruebas unitarias Jest
-pnpm test
-
-# Generar reporte completo de cobertura (>80% requerido)
-pnpm test:coverage
+pnpm test            # ejecutar pruebas unitarias
+pnpm test:coverage   # reporte de cobertura
 ```
 
-### GitHub Actions CI/CD Pipeline
-El repositorio cuenta con integración continua configurada en `.github/workflows/ci.yml` que valida:
-1. Compilación de TypeScript y suite de pruebas unitarias Jest en backend.
+### GitHub Actions
+`.github/workflows/ci.yml` valida:
+1. Compilación de TypeScript y pruebas unitarias Jest en backend.
 2. Build de producción de Vite en frontend.
-3. Validación sintáctica de contenedores Docker Compose.
+3. Validación sintáctica de Docker Compose.
 
 ---
 
 ## Tecnologías Utilizadas
 
-- **Gestor de Paquetes**: `pnpm`
-- **Backend**: Express.js, TypeScript, PostgreSQL 16 (`pg`), Zod (DTO Validation), Jest.
+- **Gestor de paquetes**: `pnpm`
+- **Backend**: Express.js, TypeScript, PostgreSQL 16 (`pg`), Zod, Jest.
 - **Frontend**: React 18, Vite, TypeScript, Tailwind CSS.
-- **Infraestructura & CI/CD**: Docker, Docker Compose, Nginx, GitHub Actions CI.
+- **Infraestructura & CI/CD**: Docker, Docker Compose, Nginx, GitHub Actions.
 
 ---
 
-## Supuestos Realizados y Alcance
+## Supuestos y Alcance
 
-- **Supuesto 1**: Al crear una solicitud, su estado inicial por defecto es `pendiente`.
-- **Supuesto 2**: El código de ticket (`REQ-XXXX`) funciona como identificador inmutable de referencia rápida para los usuarios.
+- Al crear una solicitud, su estado inicial por defecto es `pendiente`.
+- El código de ticket (`REQ-XXXX`) es un identificador inmutable de referencia rápida.
 
----
-
-## Funcionalidades Completadas vs Pendientes
-
-### Completadas
+### Completado
 - [x] Contenerización total con Docker Compose (Postgres 16, Backend, Frontend).
-- [x] Pipeline de CI/CD automatizado con GitHub Actions.
-- [x] Tablero Kanban estilo Jira con Drag & Drop entre columnas.
-- [x] Panel Drawer lateral para inspección y edición de campos.
-- [x] Notificaciones Toast con estilo Ant Design.
-- [x] Diseño responsivo adaptado a teléfonos, tablets y escritorios.
-- [x] Creación, actualización completa, filtrado y búsqueda de solicitudes.
-- [x] Badges de estado/prioridad con etiquetas de cuadros de color.
+- [x] Pipeline de CI/CD con GitHub Actions.
+- [x] Tablero Kanban con Drag & Drop entre columnas.
+- [x] Panel Drawer lateral para inspección y edición.
+- [x] Notificaciones Toast.
+- [x] Diseño responsivo (teléfono, tablet y escritorio).
+- [x] Creación, actualización, filtrado y búsqueda de solicitudes.
+- [x] Badges de estado y prioridad.
 - [x] Pruebas unitarias automatizadas con Jest.
 
-### Pendientes / Próximos Pasos (Para llevar a Producción)
-- [ ] **Autenticación y Autorización**: Integración de JWT y roles (Solicitante / Administrador / Agente).
-- [ ] **Notificaciones**: Notificaciones vía WebSockets o Server-Sent Events (SSE) en tiempo real al cambiar estados.
-- [ ] **Asignación de Responsable**: Asignar agentes específicos para la atención de tickets.
-- [ ] **Historial de Comentarios**: Secciones de comentarios y registros de auditoría por ticket.
+### Pendiente / próximos pasos
+- [ ] **Autenticación y autorización**: JWT y roles (Solicitante / Administrador / Agente).
+- [ ] **Notificaciones en tiempo real** vía WebSockets o SSE al cambiar estados.
+- [ ] **Asignación de responsable** por ticket.
+- [ ] **Historial de comentarios** y registro de auditoría.
 
 ---
 
-## Uso de Inteligencia Artificial (Transparencia, Criterio & Auditoría)
+## Uso de Inteligencia Artificial
 
-De acuerdo con las pautas del desafío, el uso de herramientas de Inteligencia Artificial (IA) se asumió de manera transparente como un **multiplicador de productividad y copiloto de ingeniería**, enfocado en maximizar la calidad y acelerar el tiempo de desarrollo.
+Se usó IA como copiloto de ingeniería, bajo dirección y auditoría del desarrollador, para acelerar tareas repetitivas: redacción de las pruebas Jest, boilerplate (interfaces, DTOs Zod, controladores, configuración de Docker y CI), clases Tailwind de responsividad y apoyo en el Drag & Drop nativo de HTML5.
 
-### ¿Por qué se utilizó?
-Para optimizar el tiempo de desarrollo de 4 horas, eliminando la fricción de escribir código repetitivo (*boilerplate*) y permitiendo enfocar la mayor parte del esfuerzo humano en la **arquitectura backend, seguridad estricta con Zod, persistencia real en PostgreSQL 16 y excelencia en la experiencia de usuario (UX/UI)**.
-
-### ¿En qué y cómo se utilizó?
-Se utilizó en modalidad de *pair programming* guiado paso a paso por las directrices del desarrollador para:
-- **Escribir Pruebas Automatizadas**: Redacción acelerada de 38 pruebas unitarias con Jest y mocks de BD, alcanzando un **99.02% de cobertura de código**.
-- **Boilerplate y Configuración**: Generación inicial de interfaces TypeScript, DTOs de Zod, controladores Express y configuraciones de Tailwind CSS, Docker Compose y GitHub Actions CI.
-- **Maquetado UI y Ajustes de Responsividad**: Asistencia en clases utilitarias de Tailwind CSS para la adaptación móvil (tarjetas dinámicas `min-h-[180px]` y scroll de columnas).
-- **Lógica de Drag & Drop**: Apoyo en la arquitectura del tablero Kanban sustituyendo librerías manipuladoras de DOM por Drag and Drop nativo de HTML5 en React.
-
-### Liderazgo Técnico, Auditoría y Modificaciones del Desarrollador
-La IA actuó exclusivamente bajo la **dirección, supervisión y auditoría del desarrollador**:
-1. **Definición de Requerimientos**: El desarrollador estableció la visión del producto, los supuestos de negocio y las decisiones de arquitectura (Vertical Slices, PostgreSQL 16, Docker Compose, Drawer de edición y Toasts estilo Ant Design).
-2. **Revisión y Ajustes Manuales**: El desarrollador corrigió activamente la lógica de estado en React para eliminar duplicaciones de tarjetas en el Kanban, ajustó los selectores nativos en móviles para evitar desfases visuales y perfeccionó las consultas SQL parametrizadas con `COALESCE`.
-3. **Validación y Pruebas Reales**: Cada propuesta de código fue auditada, compilada estrictamente (`tsc --noEmit`), probada mediante Jest (`pnpm test:coverage`) y verificada en vivo en los contenedores contenerizados con Docker Compose.
+Las decisiones de arquitectura (Vertical Slices, PostgreSQL 16, Docker Compose), la corrección de la lógica de estado en React, el ajuste de consultas SQL parametrizadas (`COALESCE`) y la validación final (`tsc --noEmit`, `pnpm test:coverage` y pruebas en contenedores) fueron responsabilidad del desarrollador.
